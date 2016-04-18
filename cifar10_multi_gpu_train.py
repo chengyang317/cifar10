@@ -54,9 +54,9 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('train_dir', './cifar10_train',
                            """Directory where to write event logs """
                            """and checkpoint.""")
-tf.app.flags.DEFINE_integer('max_steps', 1000000,
+tf.app.flags.DEFINE_integer('max_steps', 5000,
                             """Number of batches to run.""")
-tf.app.flags.DEFINE_integer('num_gpus', 1,
+tf.app.flags.DEFINE_integer('num_gpus', 3,
                             """How many GPUs to use.""")
 tf.app.flags.DEFINE_boolean('log_device_placement', False,
                             """Whether to log device placement.""")
@@ -102,8 +102,8 @@ def tower_loss(scope):
         tf.scalar_summary(loss_name + ' (raw)', l)
         tf.scalar_summary(loss_name, loss_averages.average(l))
 
-    with tf.control_dependencies([loss_averages_op]):
-        total_loss = tf.identity(total_loss)
+        with tf.control_dependencies([loss_averages_op]):
+            total_loss = tf.identity(total_loss)
     return total_loss
 
 

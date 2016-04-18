@@ -23,6 +23,7 @@ import os
 
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
+import cPickle
 
 # Process images of this size. Note that this differs from the original CIFAR
 # image size of 32 x 32. If one alters this number, then the entire model
@@ -31,8 +32,32 @@ IMAGE_SIZE = 24
 
 # Global constants describing the CIFAR-10 data set.
 NUM_CLASSES = 10
-NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 50000
+NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 40
 NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 10000
+
+DATA_PERCENT = 0.2
+
+
+def unpickle(file_path):
+    fo = open(file_path, 'rb')
+    dict = cPickle.load(fo)
+    fo.close()
+    return dict
+
+
+def create_dataset(data_dir):
+    filename = os.path.join(data_dir, 'data_batch_%s' % str(DATA_PERCENT))
+    if tf.gfile.Exists(filename):
+        return
+    filenames = [os.path.join(data_dir, 'data_batch_%d' % i) for i in xrange(1, 6)]
+    data_list = list()
+    for f in filenames:
+        if not tf.gfile.Exists(f):
+            raise ValueError('Failed to find file: ' + f)
+        data_list.append(unpickle(f))
+    pass
+
+
 
 
 def read_cifar10(filename_queue):
@@ -139,6 +164,7 @@ def distorted_inputs(data_dir, batch_size):
       images: Images. 4D tensor of [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3] size.
       labels: Labels. 1D tensor of [batch_size] size.
     """
+    # create_dataset(data_dir)
     filenames = [os.path.join(data_dir, 'data_batch_%d.bin' % i)
                  for i in xrange(1, 6)]
     for f in filenames:

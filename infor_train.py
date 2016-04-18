@@ -51,7 +51,7 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string('train_dir', './cifar10_train',
                            """Directory where to write event logs """
                            """and checkpoint.""")
-tf.app.flags.DEFINE_integer('max_steps', 10000,
+tf.app.flags.DEFINE_integer('max_steps', 5000,
                             """Number of batches to run.""")
 tf.app.flags.DEFINE_boolean('log_device_placement', False,
                             """Whether to log device placement.""")
@@ -74,7 +74,7 @@ def train():
 
         # Build a Graph that trains the model with one batch of examples and
         # updates the model parameters.
-        train_op, lr = cifar10.train(loss, global_step)
+        train_op = cifar10.train(loss, global_step)
 
         # Create a saver.
         saver = tf.train.Saver(tf.all_variables())
@@ -98,7 +98,7 @@ def train():
 
         for step in xrange(FLAGS.max_steps):
             start_time = time.time()
-            _, loss_value, lr_value = sess.run([train_op, loss, lr])
+            _, loss_value = sess.run([train_op, loss])
             duration = time.time() - start_time
 
             assert not np.isnan(loss_value), 'Model diverged with loss = NaN'
@@ -108,9 +108,9 @@ def train():
                 examples_per_sec = num_examples_per_step / duration
                 sec_per_batch = float(duration)
 
-                format_str = ('%s: step %d, loss = %.2f, lr_value = %.4f (%.1f examples/sec; %.3f '
+                format_str = ('%s: step %d, loss = %.2f (%.1f examples/sec; %.3f '
                               'sec/batch)')
-                print(format_str % (datetime.now(), step, loss_value, lr_value,
+                print(format_str % (datetime.now(), step, loss_value,
                                     examples_per_sec, sec_per_batch))
 
             if step % 100 == 0:
