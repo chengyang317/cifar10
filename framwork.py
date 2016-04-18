@@ -148,6 +148,7 @@ def loss_func(logit, logic, lamb):
     pred = tf.reduce_all(tf.logical_not(logic))
     loss = tf.cond(pred, f1, f2)
     return loss
+    # return tf.constant(0, dtype=tf.float32)
 
 
 def lamb_func(logit, logic, lamb):
